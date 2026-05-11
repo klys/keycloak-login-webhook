@@ -41,12 +41,16 @@ final class LoginWebhookDispatcher {
             builder.header(config.secretHeader(), config.sharedSecret());
         }
 
-        httpClient.sendAsync(builder.build(), HttpResponse.BodyHandlers.discarding())
+        HttpRequest request = builder.build();
+
+        httpClient.sendAsync(request, HttpResponse.BodyHandlers.discarding())
                 .thenAccept(response -> {
                     if (response.statusCode() >= 400) {
                         LOGGER.warnf(
-                                "Login webhook returned HTTP %d for realm=%s userId=%s",
+                                "Login webhook returned HTTP %d for %s %s realm=%s userId=%s",
                                 response.statusCode(),
+                                request.method(),
+                                request.uri(),
                                 payload.get("realmName"),
                                 payload.get("userId"));
                     }
@@ -69,3 +73,4 @@ final class LoginWebhookDispatcher {
         }
     }
 }
+
